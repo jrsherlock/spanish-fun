@@ -1,127 +1,157 @@
-# 🇪🇸 Spanish II - Reflexive Verbs Master
+# 🇪🇸 Spanish Fun - Gamified Language Learning
 
-An interactive web application to help students master Spanish reflexive verbs through quizzes, flashcards, and practice exercises.
+A modern, gamified Spanish learning platform built with React, Supabase, and AI.
 
-## Features
+## ✨ Features
 
-- 📚 **Learn Mode**: Study flashcards with verb meanings, pronouns, and key rules
-- 🎯 **Challenge Quiz**: Test your knowledge with randomized questions covering:
-  - Verb meanings
-  - Pronoun matching
-  - Reflexive vs. non-reflexive usage
-  - Conjugation
-  - Pronoun placement
-  - Preposition rules
-- 💬 **Routine Practice**: Answer questions about daily routines in complete Spanish sentences
+### 🎮 Gamification
+- **XP & Leveling System** - Earn experience points and level up
+- **Streaks** - Maintain daily learning streaks for bonus rewards
+- **Achievements** - Unlock badges for accomplishments
+- **Leaderboards** - Compete with other learners
+- **Journey Mode** - Race to the finish by answering correctly
 
-## Tech Stack
+### 📚 Multi-Unit Course Structure
+- 8 comprehensive units covering Spanish II curriculum
+- Unit 1: Reflexive Verbs & Daily Routines
+- Unit 2: House & Home
+- Unit 3: Food & Restaurants
+- Unit 4: Health & Body
+- Unit 5: Travel & Transportation
+- Unit 6: Preterite Tense
+- Unit 7: Imperfect Tense
+- Unit 8: Commands & Requests
 
-- React 18
-- Vite
-- Tailwind CSS
+### 🎯 Game Types per Unit
+- **Flashcards** - Study vocabulary interactively
+- **Challenge Quiz** - Multiple choice questions
+- **Journey Mode** - Gamified Q&A with progress tracking
+- **Speaking Practice** - Voice recognition with AI feedback
+- **Writing Challenge** - Open-ended writing with AI scoring
+- **AI Conversation** - Practice real conversations with AI tutor
 
-## Getting Started
+### 🤖 AI Integration
+- Open-ended response scoring
+- Real-time translation
+- Text-to-Speech for pronunciation
+- Speech-to-Text for speaking practice
+- AI tutor conversations
+- Personalized feedback
+
+### 💾 Supabase Backend
+- User authentication (email/password)
+- Player stats persistence
+- Unit progress tracking
+- Game session history
+- Real-time leaderboards
+
+## 🚀 Getting Started
 
 ### Prerequisites
-
-- Node.js 18+ and npm
+- Node.js 18+
+- npm or yarn
+- Supabase account (for full features)
 
 ### Installation
 
-1. Clone the repository:
 ```bash
-git clone https://github.com/YOUR_USERNAME/spanish-fun.git
+# Clone the repository
+git clone https://github.com/jrsherlock/spanish-fun.git
 cd spanish-fun
-```
 
-2. Install dependencies:
-```bash
+# Switch to the gamification-redux branch
+git checkout gamification-redux
+
+# Install dependencies
 npm install
-```
 
-3. Start the development server:
-```bash
+# Set up environment variables
+cp .env.example .env.local
+# Edit .env.local with your Supabase credentials
+
+# Start development server
 npm run dev
 ```
 
-4. Open your browser and navigate to `http://localhost:5173`
+### Supabase Setup
 
-## Building for Production
+1. Create a new project at [supabase.com](https://supabase.com)
+2. Run the migration in `supabase/migrations/001_create_schema.sql` in the SQL Editor
+3. Enable Email/Password authentication in Auth settings
+4. Copy your project URL and anon key to `.env.local`
 
-```bash
-npm run build
+```env
+VITE_SUPABASE_URL=https://your-project.supabase.co
+VITE_SUPABASE_ANON_KEY=your-anon-key-here
 ```
 
-The built files will be in the `dist` directory.
+### AI Features (Optional)
 
-## Deployment to GitHub Pages
+For AI-powered features, you can:
+1. Use Supabase Edge Functions with OpenAI
+2. Or connect to your own AI backend
 
-This project is configured to automatically deploy to GitHub Pages when you push to the `main` branch.
-
-### First-time Setup
-
-1. Create a new repository on GitHub (e.g., `spanish-fun`)
-
-2. Update the `base` path in `vite.config.js` to match your repository name:
-```js
-base: '/your-repo-name/',
-```
-
-3. Enable GitHub Pages in your repository settings:
-   - Go to Settings → Pages
-   - Under "Source", select "GitHub Actions"
-
-4. Push your code to GitHub:
-```bash
-git init
-git add .
-git commit -m "Initial commit"
-git branch -M main
-git remote add origin https://github.com/YOUR_USERNAME/spanish-fun.git
-git push -u origin main
-```
-
-The GitHub Actions workflow will automatically build and deploy your app to GitHub Pages. Your app will be available at:
-`https://YOUR_USERNAME.github.io/spanish-fun/`
-
-### Manual Deployment (Alternative)
-
-If you prefer to deploy manually, you can use the `gh-pages` package:
-
-1. Install `gh-pages`:
-```bash
-npm install --save-dev gh-pages
-```
-
-2. Add a deploy script to `package.json`:
-```json
-"scripts": {
-  "deploy": "npm run build && gh-pages -d dist"
-}
-```
-
-3. Deploy:
-```bash
-npm run deploy
-```
-
-## Project Structure
+## 📁 Project Structure
 
 ```
-spanish-fun/
-├── src/
-│   ├── App.jsx          # Main application component
-│   ├── main.jsx         # React entry point
-│   └── index.css        # Global styles
-├── .github/
-│   └── workflows/
-│       └── deploy.yml   # GitHub Actions deployment workflow
-├── index.html           # HTML template
-├── vite.config.js       # Vite configuration
-├── tailwind.config.js   # Tailwind CSS configuration
-└── package.json         # Dependencies and scripts
+src/
+├── components/
+│   ├── Auth/          # Login/signup screens
+│   ├── Home/          # Dashboard/home screen
+│   ├── Layout/        # App shell & navigation
+│   └── Units/         # Unit list & detail screens
+├── data/
+│   ├── units.js       # Course unit definitions
+│   └── unit1-content.js # Unit 1 content (vocab, questions)
+├── lib/
+│   └── supabase.js    # Supabase client & helpers
+├── services/
+│   └── aiService.js   # AI integration (TTS, scoring, etc.)
+├── store/
+│   └── useStore.js    # Zustand state management
+├── App.jsx            # Main app with routing
+└── main.jsx           # Entry point
 ```
 
-## License
+## 🛠 Tech Stack
 
-MIT
+- **Frontend**: React 18, Vite, Tailwind CSS
+- **Routing**: React Router v6
+- **State**: Zustand (with persistence)
+- **Animations**: Framer Motion
+- **Icons**: Lucide React
+- **Backend**: Supabase (Auth, Database, Real-time)
+- **AI**: OpenAI-compatible endpoints
+
+## 📱 Mobile-First Design
+
+The app is built with a mobile-first responsive design:
+- Touch-friendly interactions
+- Bottom navigation bar
+- Safe area support for notched devices
+- Smooth animations optimized for mobile
+
+## 🗺 Roadmap
+
+- [x] Basic app structure
+- [x] Authentication system
+- [x] Home dashboard
+- [x] Unit navigation
+- [ ] Flashcard game
+- [ ] Quiz game
+- [ ] Journey mode
+- [ ] Speaking practice
+- [ ] Writing challenges
+- [ ] AI tutor chat
+- [ ] Leaderboards
+- [ ] Achievements
+- [ ] Push notifications
+- [ ] Offline support
+
+## 📄 License
+
+MIT License - feel free to use for learning and education!
+
+---
+
+Built with ❤️ for Spanish learners
