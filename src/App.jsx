@@ -155,6 +155,16 @@ function getConjugationExplanation(verb, subjectIndex) {
   return explanation;
 }
 
+// Journey destinations/milestones
+const journeyMilestones = [
+  { position: 0, name: '🏠 Start', emoji: '🏠' },
+  { position: 2, name: '📚 Study Hall', emoji: '📚' },
+  { position: 4, name: '🎓 Grammar Gate', emoji: '🎓' },
+  { position: 6, name: '💬 Conversation Corner', emoji: '💬' },
+  { position: 8, name: '🌟 Mastery Mountain', emoji: '🌟' },
+  { position: 10, name: '🏆 Spanish Master!', emoji: '🏆' }
+];
+
 // Move PracticeScreen outside to prevent recreation on every render
 const PracticeScreen = ({ userInput, setUserInput, setScreen }) => {
   // Use useMemo to ensure the question is only shuffled once per component mount
@@ -270,6 +280,11 @@ export default function SpanishReflexiveGame() {
   const [learnMode, setLearnMode] = useState('verbs');
   const [totalAnswered, setTotalAnswered] = useState(0);
   const [correctAnswers, setCorrectAnswers] = useState(0);
+  const [journeyPosition, setJourneyPosition] = useState(0);
+  const [journeyQuestions, setJourneyQuestions] = useState([]);
+  const [journeyCurrentQ, setJourneyCurrentQ] = useState(0);
+  const [journeyFeedback, setJourneyFeedback] = useState(null);
+  const [journeySelectedAnswer, setJourneySelectedAnswer] = useState(null);
 
   const generateQuizQuestions = () => {
     const questions = [];
@@ -376,6 +391,57 @@ export default function SpanishReflexiveGame() {
     setTotalAnswered(0);
     setCorrectAnswers(0);
     setScreen('quiz');
+  };
+
+  const startJourney = () => {
+    setJourneyQuestions(generateQuizQuestions());
+    setJourneyCurrentQ(0);
+    setJourneyPosition(0);
+    setJourneyFeedback(null);
+    setJourneySelectedAnswer(null);
+    setScreen('journey');
+  };
+
+  const handleJourneyAnswer = (answer) => {
+    if (journeyFeedback) return;
+    
+    setJourneySelectedAnswer(answer);
+    const isCorrect = answer === journeyQuestions[journeyCurrentQ].correct;
+    
+    if (isCorrect) {
+      // Move forward on correct answer
+      setJourneyPosition(prev => Math.min(10, prev + 1));
+      setJourneyFeedback({ 
+        correct: true, 
+        message: '✅ Correct! You move forward!',
+        explanation: journeyQuestions[journeyCurrentQ].explanation
+      });
+    } else {
+      // Move backward on incorrect answer (setback)
+      setJourneyPosition(prev => Math.max(0, prev - 1));
+      setJourneyFeedback({ 
+        correct: false, 
+        message: '❌ Wrong! You take a step back...',
+        explanation: journeyQuestions[journeyCurrentQ].explanation
+      });
+    }
+  };
+
+  const nextJourneyQuestion = () => {
+    if (journeyPosition >= 10) {
+      // Reached destination!
+      setScreen('journeyComplete');
+    } else if (journeyCurrentQ < journeyQuestions.length - 1) {
+      setJourneyCurrentQ(prev => prev + 1);
+      setJourneyFeedback(null);
+      setJourneySelectedAnswer(null);
+    } else {
+      // Out of questions, generate new ones
+      setJourneyQuestions(generateQuizQuestions());
+      setJourneyCurrentQ(0);
+      setJourneyFeedback(null);
+      setJourneySelectedAnswer(null);
+    }
   };
 
   const handleAnswer = (answer) => {
@@ -568,6 +634,19 @@ export default function SpanishReflexiveGame() {
               </div>
             </div>
           </button>
+
+          <button
+            onClick={startJourney}
+            className="w-full py-4 px-4 sm:px-6 bg-white rounded-2xl shadow-lg hover:shadow-xl transition transform hover:scale-105 active:scale-95 min-h-[64px] touch-manipulation"
+          >
+            <div className="flex items-center gap-3 sm:gap-4">
+              <span className="text-2xl sm:text-3xl">🗺️</span>
+              <div className="text-left">
+                <p className="font-bold text-gray-800 text-base sm:text-lg">Journey Mode</p>
+                <p className="text-xs sm:text-sm text-gray-500">Reach the destination! Setbacks on wrong answers</p>
+              </div>
+            </div>
+          </button>
         </div>
 
         <div className="mt-6 sm:mt-8 text-white/80 text-xs sm:text-sm text-center max-w-sm px-4">
@@ -583,6 +662,151 @@ export default function SpanishReflexiveGame() {
 
   if (screen === 'practice') {
     return <PracticeScreen userInput={userInput} setUserInput={setUserInput} setScreen={setScreen} />;
+  }
+
+  if (screen === 'journeyComplete') {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-purple-500 via-pink-500 to-red-500 p-3 sm:p-4 flex flex-col items-center justify-center">
+        <div className="bg-white rounded-3xl p-4 sm:p-8 shadow-2xl max-w-sm w-full text-center">
+          <p className="text-6xl sm:text-7xl mb-4">🏆</p>
+          <h2 className="text-2xl sm:text-3xl font-bold text-gray-800 mb-2">¡Felicidades!</h2>
+          <p className="text-lg sm:text-xl text-gray-600 mb-6">You've reached Spanish Mastery!</p>
+          
+          <div className="bg-gradient-to-r from-purple-100 to-pink-100 rounded-2xl p-4 my-6">
+            <p className="text-3xl sm:text-4xl font-bold text-purple-600">🎉</p>
+            <p className="text-sm sm:text-base text-gray-600 mt-2">Journey Complete!</p>
+          </div>
+
+          <div className="space-y-2 sm:space-y-3">
+            <button
+              onClick={startJourney}
+              className="w-full py-3 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-xl font-bold hover:from-purple-600 hover:to-pink-600 active:from-purple-700 active:to-pink-700 min-h-[44px] touch-manipulation text-sm sm:text-base"
+            >
+              Journey Again
+            </button>
+            <button
+              onClick={() => setScreen('menu')}
+              className="w-full py-3 bg-gray-100 text-gray-700 rounded-xl font-medium hover:bg-gray-200 active:bg-gray-300 min-h-[44px] touch-manipulation text-sm sm:text-base"
+            >
+              Back to Menu
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (screen === 'journey') {
+    const q = journeyQuestions[journeyCurrentQ];
+    if (!q) return null;
+
+    const currentMilestone = journeyMilestones.find(m => m.position <= journeyPosition) || journeyMilestones[0];
+    const nextMilestone = journeyMilestones.find(m => m.position > journeyPosition) || journeyMilestones[journeyMilestones.length - 1];
+    const progressPercent = (journeyPosition / 10) * 100;
+
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-purple-500 via-pink-500 to-red-500 p-3 sm:p-4">
+        <div className="max-w-lg mx-auto">
+          {/* Header */}
+          <div className="flex justify-between items-center mb-3 sm:mb-4 gap-2">
+            <button 
+              onClick={() => setScreen('menu')}
+              className="text-white/80 hover:text-white active:text-white text-sm sm:text-base min-h-[44px] touch-manipulation"
+            >
+              ← Exit
+            </button>
+            <div className="flex items-center gap-2 sm:gap-4">
+              <span className="text-white font-medium text-sm sm:text-base">Position: {journeyPosition}/10</span>
+            </div>
+          </div>
+
+          {/* Journey Progress */}
+          <div className="bg-white/20 rounded-2xl p-4 sm:p-6 mb-4 sm:mb-6 backdrop-blur-sm">
+            <div className="mb-3 sm:mb-4">
+              <div className="flex justify-between items-center mb-2">
+                <span className="text-white text-xs sm:text-sm font-medium">{currentMilestone.name}</span>
+                <span className="text-white text-xs sm:text-sm font-medium">{nextMilestone.name}</span>
+              </div>
+              <div className="bg-white/30 rounded-full h-3 sm:h-4 mb-2">
+                <div 
+                  className="bg-gradient-to-r from-yellow-300 to-yellow-500 rounded-full h-3 sm:h-4 transition-all duration-500"
+                  style={{ width: `${progressPercent}%` }}
+                />
+              </div>
+              <div className="flex justify-between text-white/70 text-xs">
+                <span>{currentMilestone.emoji}</span>
+                <span>{nextMilestone.emoji}</span>
+              </div>
+            </div>
+            <p className="text-white text-center text-sm sm:text-base font-medium">
+              {journeyPosition < 10 ? `Keep going! ${10 - journeyPosition} steps to ${nextMilestone.name}` : 'Almost there!'}
+            </p>
+          </div>
+
+          {/* Question card */}
+          <div className="bg-white rounded-2xl p-4 sm:p-6 shadow-xl">
+            <span className="text-xs font-medium text-purple-500 bg-purple-100 px-2 sm:px-3 py-1 rounded-full">
+              {q.category}
+            </span>
+            <p className="text-xs sm:text-sm text-gray-500 mt-3 sm:mt-4 mb-2">Question {journeyCurrentQ + 1}</p>
+            <h3 className="text-lg sm:text-xl font-bold text-gray-800 mb-4 sm:mb-6 break-words">{q.question}</h3>
+
+            <div className="space-y-2 sm:space-y-3">
+              {q.options.map((option, idx) => (
+                <button
+                  key={idx}
+                  onClick={() => handleJourneyAnswer(option)}
+                  disabled={journeyFeedback !== null}
+                  className={`w-full p-3 sm:p-4 rounded-xl text-left font-medium transition min-h-[44px] touch-manipulation text-sm sm:text-base break-words ${
+                    journeyFeedback
+                      ? option === q.correct
+                        ? 'bg-green-100 border-2 border-green-500 text-green-700'
+                        : journeySelectedAnswer === option
+                          ? 'bg-red-100 border-2 border-red-500 text-red-700'
+                          : 'bg-gray-50 text-gray-400'
+                      : 'bg-gray-50 hover:bg-purple-50 hover:border-purple-300 border-2 border-transparent text-gray-700 active:bg-purple-100'
+                  }`}
+                >
+                  {option}
+                </button>
+              ))}
+            </div>
+
+            {journeyFeedback && (
+              <div className={`mt-4 p-3 sm:p-4 rounded-xl ${journeyFeedback.correct ? 'bg-green-50 border border-green-200' : 'bg-red-50 border border-red-200'}`}>
+                <p className={`font-medium text-sm sm:text-base ${journeyFeedback.correct ? 'text-green-700' : 'text-red-700'} break-words`}>
+                  {journeyFeedback.message}
+                </p>
+                {journeyFeedback.explanation && (
+                  <div className="mt-3 pt-3 border-t border-gray-200">
+                    <p className="text-xs sm:text-sm text-gray-700 break-words">
+                      <span className="font-semibold">💡 Why? </span>
+                      {journeyFeedback.explanation}
+                    </p>
+                  </div>
+                )}
+                <div className="mt-3 pt-3 border-t border-gray-200">
+                  <p className="text-xs sm:text-sm font-medium text-gray-700">
+                    {journeyFeedback.correct 
+                      ? `✅ You're now at position ${journeyPosition}/10` 
+                      : `⚠️ Setback! You're now at position ${journeyPosition}/10`}
+                  </p>
+                </div>
+              </div>
+            )}
+
+            {journeyFeedback && (
+              <button
+                onClick={nextJourneyQuestion}
+                className="w-full mt-4 py-3 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-xl font-bold hover:from-purple-600 hover:to-pink-600 active:from-purple-700 active:to-pink-700 min-h-[44px] touch-manipulation text-sm sm:text-base"
+              >
+                {journeyPosition >= 10 ? '🎉 Complete Journey!' : 'Next Question →'}
+              </button>
+            )}
+          </div>
+        </div>
+      </div>
+    );
   }
 
   if (screen === 'results') {
