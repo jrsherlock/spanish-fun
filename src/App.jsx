@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 
 const reflexiveVerbs = [
   { infinitive: 'levantarse', meaning: 'to get up', stem: 'levant', regular: true, explanation: 'Levantar = to lift/raise. Adding -se makes it "to raise oneself" = get up' },
@@ -154,6 +154,106 @@ function getConjugationExplanation(verb, subjectIndex) {
   
   return explanation;
 }
+
+// Move PracticeScreen outside to prevent recreation on every render
+const PracticeScreen = ({ userInput, setUserInput, setScreen }) => {
+  // Use useMemo to ensure the question is only shuffled once per component mount
+  // This prevents the question from changing when the component re-renders
+  const initialQuestion = useMemo(() => {
+    return shuffle([...routineQuestions])[0];
+  }, []);
+  
+  const [practiceQ, setPracticeQ] = useState(() => initialQuestion);
+  const [showExample, setShowExample] = useState(false);
+  const [submitted, setSubmitted] = useState(false);
+
+  const nextPractice = () => {
+    const newQuestion = shuffle([...routineQuestions])[0];
+    setPracticeQ(newQuestion);
+    setUserInput('');
+    setShowExample(false);
+    setSubmitted(false);
+  };
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-emerald-500 via-teal-500 to-cyan-600 p-3 sm:p-4">
+      <div className="max-w-lg mx-auto">
+        <button 
+          onClick={() => setScreen('menu')}
+          className="mb-4 text-white/80 hover:text-white active:text-white flex items-center gap-2 text-base sm:text-lg min-h-[44px] touch-manipulation"
+        >
+          ← Back to Menu
+        </button>
+        
+        <h2 className="text-xl sm:text-2xl font-bold text-white mb-2 text-center px-2">💬 Routine Practice</h2>
+        <p className="text-white/80 text-center mb-4 sm:mb-6 text-sm sm:text-base px-2">Answer questions about daily routines in complete Spanish sentences!</p>
+
+        <div className="bg-white rounded-2xl p-4 sm:p-6 shadow-xl">
+          <p className="text-lg sm:text-xl font-bold text-gray-800 mb-2 break-words">{practiceQ.question}</p>
+          <p className="text-xs sm:text-sm text-gray-500 mb-4 break-words">({practiceQ.hint})</p>
+          
+          <textarea
+            value={userInput}
+            onChange={(e) => setUserInput(e.target.value)}
+            placeholder="Write your answer in a complete Spanish sentence..."
+            className="w-full p-3 sm:p-4 border-2 border-gray-200 rounded-xl focus:border-teal-400 focus:outline-none resize-none text-base"
+            rows={4}
+          />
+
+          <div className="flex flex-col sm:flex-row gap-2 mt-4">
+            <button
+              onClick={() => setShowExample(!showExample)}
+              className="flex-1 py-3 sm:py-3 bg-gray-100 text-gray-700 rounded-xl font-medium hover:bg-gray-200 active:bg-gray-300 min-h-[44px] touch-manipulation text-sm sm:text-base"
+            >
+              {showExample ? 'Hide' : 'Show'} Example
+            </button>
+            <button
+              onClick={() => setSubmitted(true)}
+              className="flex-1 py-3 sm:py-3 bg-teal-500 text-white rounded-xl font-medium hover:bg-teal-600 active:bg-teal-700 min-h-[44px] touch-manipulation text-sm sm:text-base"
+            >
+              Check Answer
+            </button>
+          </div>
+
+          {showExample && (
+            <div className="mt-4 p-3 sm:p-4 bg-teal-50 rounded-xl border-2 border-teal-200">
+              <p className="text-xs sm:text-sm text-teal-600 font-medium">Example answer:</p>
+              <p className="text-sm sm:text-base text-teal-800 font-medium break-words mt-1">{practiceQ.exampleAnswer}</p>
+            </div>
+          )}
+
+          {submitted && (
+            <div className="mt-4 p-3 sm:p-4 bg-blue-50 rounded-xl border-2 border-blue-200">
+              <p className="text-xs sm:text-sm text-blue-600 font-medium mb-2">✅ Self-check your answer:</p>
+              <ul className="text-xs sm:text-sm text-blue-800 space-y-1">
+                <li>• Did you use the correct reflexive pronoun?</li>
+                <li>• Is the verb conjugated correctly?</li>
+                <li>• Is it a complete sentence?</li>
+                <li>• Does the pronoun match the subject?</li>
+              </ul>
+            </div>
+          )}
+
+          <button
+            onClick={nextPractice}
+            className="w-full mt-4 py-3 bg-gradient-to-r from-teal-500 to-cyan-500 text-white rounded-xl font-bold hover:from-teal-600 hover:to-cyan-600 active:from-teal-700 active:to-cyan-700 min-h-[44px] touch-manipulation text-sm sm:text-base"
+          >
+            Next Question →
+          </button>
+        </div>
+
+        <div className="mt-4 sm:mt-6 bg-white/20 rounded-xl p-3 sm:p-4">
+          <p className="text-white font-medium mb-2 text-sm sm:text-base">💡 Tips for answering:</p>
+          <ul className="text-white/90 text-xs sm:text-sm space-y-1">
+            <li>• Start with the subject (Yo, Mi mamá, etc.)</li>
+            <li>• Add the reflexive pronoun before the conjugated verb</li>
+            <li>• Include time expressions when relevant (a las siete, por la mañana)</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  );
+};
 
 export default function SpanishReflexiveGame() {
   const [screen, setScreen] = useState('menu');
@@ -417,97 +517,6 @@ export default function SpanishReflexiveGame() {
     );
   };
 
-  const PracticeScreen = () => {
-    const [practiceQ, setPracticeQ] = useState(shuffle(routineQuestions)[0]);
-    const [showExample, setShowExample] = useState(false);
-    const [submitted, setSubmitted] = useState(false);
-
-    const nextPractice = () => {
-      setPracticeQ(shuffle(routineQuestions)[0]);
-      setUserInput('');
-      setShowExample(false);
-      setSubmitted(false);
-    };
-
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-emerald-500 via-teal-500 to-cyan-600 p-3 sm:p-4">
-        <div className="max-w-lg mx-auto">
-          <button 
-            onClick={() => setScreen('menu')}
-            className="mb-4 text-white/80 hover:text-white active:text-white flex items-center gap-2 text-base sm:text-lg min-h-[44px] touch-manipulation"
-          >
-            ← Back to Menu
-          </button>
-          
-          <h2 className="text-xl sm:text-2xl font-bold text-white mb-2 text-center px-2">💬 Routine Practice</h2>
-          <p className="text-white/80 text-center mb-4 sm:mb-6 text-sm sm:text-base px-2">Answer questions about daily routines in complete Spanish sentences!</p>
-
-          <div className="bg-white rounded-2xl p-4 sm:p-6 shadow-xl">
-            <p className="text-lg sm:text-xl font-bold text-gray-800 mb-2 break-words">{practiceQ.question}</p>
-            <p className="text-xs sm:text-sm text-gray-500 mb-4 break-words">({practiceQ.hint})</p>
-            
-            <textarea
-              value={userInput}
-              onChange={(e) => setUserInput(e.target.value)}
-              placeholder="Write your answer in a complete Spanish sentence..."
-              className="w-full p-3 sm:p-4 border-2 border-gray-200 rounded-xl focus:border-teal-400 focus:outline-none resize-none text-base"
-              rows={4}
-            />
-
-            <div className="flex flex-col sm:flex-row gap-2 mt-4">
-              <button
-                onClick={() => setShowExample(!showExample)}
-                className="flex-1 py-3 sm:py-3 bg-gray-100 text-gray-700 rounded-xl font-medium hover:bg-gray-200 active:bg-gray-300 min-h-[44px] touch-manipulation text-sm sm:text-base"
-              >
-                {showExample ? 'Hide' : 'Show'} Example
-              </button>
-              <button
-                onClick={() => setSubmitted(true)}
-                className="flex-1 py-3 sm:py-3 bg-teal-500 text-white rounded-xl font-medium hover:bg-teal-600 active:bg-teal-700 min-h-[44px] touch-manipulation text-sm sm:text-base"
-              >
-                Check Answer
-              </button>
-            </div>
-
-            {showExample && (
-              <div className="mt-4 p-3 sm:p-4 bg-teal-50 rounded-xl border-2 border-teal-200">
-                <p className="text-xs sm:text-sm text-teal-600 font-medium">Example answer:</p>
-                <p className="text-sm sm:text-base text-teal-800 font-medium break-words mt-1">{practiceQ.exampleAnswer}</p>
-              </div>
-            )}
-
-            {submitted && (
-              <div className="mt-4 p-3 sm:p-4 bg-blue-50 rounded-xl border-2 border-blue-200">
-                <p className="text-xs sm:text-sm text-blue-600 font-medium mb-2">✅ Self-check your answer:</p>
-                <ul className="text-xs sm:text-sm text-blue-800 space-y-1">
-                  <li>• Did you use the correct reflexive pronoun?</li>
-                  <li>• Is the verb conjugated correctly?</li>
-                  <li>• Is it a complete sentence?</li>
-                  <li>• Does the pronoun match the subject?</li>
-                </ul>
-              </div>
-            )}
-
-            <button
-              onClick={nextPractice}
-              className="w-full mt-4 py-3 bg-gradient-to-r from-teal-500 to-cyan-500 text-white rounded-xl font-bold hover:from-teal-600 hover:to-cyan-600 active:from-teal-700 active:to-cyan-700 min-h-[44px] touch-manipulation text-sm sm:text-base"
-            >
-              Next Question →
-            </button>
-          </div>
-
-          <div className="mt-4 sm:mt-6 bg-white/20 rounded-xl p-3 sm:p-4">
-            <p className="text-white font-medium mb-2 text-sm sm:text-base">💡 Tips for answering:</p>
-            <ul className="text-white/90 text-xs sm:text-sm space-y-1">
-              <li>• Start with the subject (Yo, Mi mamá, etc.)</li>
-              <li>• Add the reflexive pronoun before the conjugated verb</li>
-              <li>• Include time expressions when relevant (a las siete, por la mañana)</li>
-            </ul>
-          </div>
-        </div>
-      </div>
-    );
-  };
 
   if (screen === 'menu') {
     return (
@@ -573,7 +582,7 @@ export default function SpanishReflexiveGame() {
   }
 
   if (screen === 'practice') {
-    return <PracticeScreen />;
+    return <PracticeScreen userInput={userInput} setUserInput={setUserInput} setScreen={setScreen} />;
   }
 
   if (screen === 'results') {
