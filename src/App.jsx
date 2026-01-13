@@ -289,8 +289,8 @@ export default function SpanishReflexiveGame() {
   const generateQuizQuestions = () => {
     const questions = [];
     
-    // Verb meaning questions
-    const shuffledVerbs = shuffle(reflexiveVerbs).slice(0, 4);
+    // Verb meaning questions (increased from 4 to 6)
+    const shuffledVerbs = shuffle(reflexiveVerbs).slice(0, 6);
     shuffledVerbs.forEach(verb => {
       const wrongAnswers = shuffle(reflexiveVerbs.filter(v => v.infinitive !== verb.infinitive))
         .slice(0, 3)
@@ -305,8 +305,8 @@ export default function SpanishReflexiveGame() {
       });
     });
 
-    // Pronoun matching
-    const pronounQuestions = shuffle([0, 1, 2, 3, 4, 5]).slice(0, 3);
+    // Pronoun matching (increased from 3 to 5)
+    const pronounQuestions = shuffle([0, 1, 2, 3, 4, 5]).slice(0, 5);
     pronounQuestions.forEach(idx => {
       const wrongPronouns = pronouns.filter((_, i) => i !== idx);
       questions.push({
@@ -319,8 +319,8 @@ export default function SpanishReflexiveGame() {
       });
     });
 
-    // Reflexive vs not reflexive
-    const refVsNot = shuffle(reflexiveVsNot).slice(0, 3);
+    // Reflexive vs not reflexive (increased from 3 to 5)
+    const refVsNot = shuffle(reflexiveVsNot).slice(0, 5);
     refVsNot.forEach(item => {
       questions.push({
         type: 'reflexiveVsNot',
@@ -332,8 +332,8 @@ export default function SpanishReflexiveGame() {
       });
     });
 
-    // Conjugation questions
-    const conjVerbs = shuffle(reflexiveVerbs.filter(v => v.regular)).slice(0, 3);
+    // Conjugation questions (increased from 3 to 5)
+    const conjVerbs = shuffle(reflexiveVerbs.filter(v => v.regular)).slice(0, 5);
     conjVerbs.forEach(verb => {
       const subjectIdx = Math.floor(Math.random() * 6);
       const correctConj = getConjugation(verb, subjectIdx);
@@ -352,8 +352,8 @@ export default function SpanishReflexiveGame() {
       });
     });
 
-    // Pronoun placement questions
-    const placementQs = shuffle(pronounPlacement).slice(0, 2);
+    // Pronoun placement questions (increased from 2 to 3)
+    const placementQs = shuffle(pronounPlacement).slice(0, 3);
     placementQs.forEach(item => {
       questions.push({
         type: 'placement',
@@ -365,8 +365,8 @@ export default function SpanishReflexiveGame() {
       });
     });
 
-    // Preposition rules
-    const prepQs = shuffle(prepositionRules).slice(0, 2);
+    // Preposition rules (increased from 2 to 3)
+    const prepQs = shuffle(prepositionRules).slice(0, 3);
     prepQs.forEach(item => {
       questions.push({
         type: 'preposition',
