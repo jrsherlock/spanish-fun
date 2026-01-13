@@ -884,12 +884,74 @@ export default function SpanishReflexiveGame() {
           </div>
         </div>
 
-        {/* Progress bar */}
-        <div className="bg-white/20 rounded-full h-2 mb-4 sm:mb-6">
-          <div 
-            className="bg-white rounded-full h-2 transition-all"
-            style={{ width: `${((currentQuestion + 1) / gameQuestions.length) * 100}%` }}
-          />
+        {/* Car Journey Progress */}
+        <div className="bg-white/10 rounded-2xl p-4 sm:p-6 mb-4 sm:mb-6 backdrop-blur-sm border border-white/20">
+          <div className="relative">
+            {/* Road */}
+            <div className="relative h-16 sm:h-20 bg-gradient-to-r from-gray-700 via-gray-600 to-gray-700 rounded-lg overflow-hidden">
+              {/* Road lines */}
+              <div className="absolute inset-0 flex items-center">
+                <div className="w-full h-0.5 bg-yellow-300 opacity-60" style={{
+                  backgroundImage: 'repeating-linear-gradient(to right, transparent, transparent 20px, yellow 20px, yellow 40px)'
+                }}></div>
+              </div>
+              
+              {/* Start flag */}
+              <div className="absolute left-2 top-1/2 -translate-y-1/2 flex flex-col items-center">
+                <span className="text-lg sm:text-xl">🏁</span>
+                <span className="text-[8px] sm:text-xs text-white font-bold mt-0.5">START</span>
+              </div>
+              
+              {/* Finish flag */}
+              <div className="absolute right-2 top-1/2 -translate-y-1/2 flex flex-col items-center">
+                <span className="text-lg sm:text-xl">🏆</span>
+                <span className="text-[8px] sm:text-xs text-white font-bold mt-0.5">FINISH</span>
+              </div>
+              
+              {/* Car */}
+              <div 
+                className="absolute top-1/2 -translate-y-1/2 transition-all duration-500 ease-out"
+                style={{ 
+                  left: `calc(${((currentQuestion + 1) / gameQuestions.length) * 100}% - 20px)`,
+                  transform: 'translateY(-50%)'
+                }}
+              >
+                <div className="relative">
+                  <span className="text-2xl sm:text-3xl">🚗</span>
+                  {/* Speed lines effect */}
+                  {feedback && feedback.correct && (
+                    <div className="absolute -left-4 top-1/2 -translate-y-1/2 animate-pulse">
+                      <span className="text-white/60 text-xs">✨</span>
+                    </div>
+                  )}
+                </div>
+              </div>
+              
+              {/* Milestones */}
+              {[25, 50, 75].map((percent, idx) => (
+                <div 
+                  key={idx}
+                  className="absolute top-0 bottom-0 flex flex-col items-center justify-center"
+                  style={{ left: `${percent}%`, transform: 'translateX(-50%)' }}
+                >
+                  <div className="w-1 h-full bg-yellow-400/40"></div>
+                  <div className="absolute top-1/2 -translate-y-1/2 bg-white/90 rounded-full w-6 h-6 sm:w-8 sm:h-8 flex items-center justify-center shadow-lg border-2 border-yellow-400">
+                    <span className="text-xs sm:text-sm">✓</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+            
+            {/* Progress text */}
+            <div className="flex justify-between items-center mt-2 sm:mt-3 px-1">
+              <span className="text-white/80 text-xs sm:text-sm font-medium">
+                Question {currentQuestion + 1} of {gameQuestions.length}
+              </span>
+              <span className="text-white/80 text-xs sm:text-sm font-medium">
+                {Math.round(((currentQuestion + 1) / gameQuestions.length) * 100)}% Complete
+              </span>
+            </div>
+          </div>
         </div>
 
         {/* Question card */}
